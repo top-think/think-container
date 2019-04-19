@@ -1,7 +1,16 @@
-PHP Container & Facade Manager
+PHP Container & Facade Manager( Support PSR-11)
 ===============
 
 composer require topthink/think-container
+
+## 特性
+
+* 支持PSR-11规范
+* 支持依赖注入
+* 支持Facade门面
+* 支持容器对象绑定
+* 支持闭包绑定
+* 支持接口绑定
 
 ## Container
 ~~~
@@ -21,7 +30,7 @@ $container->delete('cache');
 $container->invoke($callable, $vars);
 // 执行某个类的实例化 支持依赖注入
 $container->invokeClass($class, $vars);
-// 静态方法获取容器对象实例
+// 静态方法获取容器对象实例 不存在则自动实例化
 \think\Container::pull('cache');
 ~~~
 
