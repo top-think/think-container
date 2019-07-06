@@ -8,6 +8,8 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
+declare (strict_types = 1);
+
 namespace think;
 
 use ArrayAccess;
@@ -48,6 +50,12 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     protected $bind = [];
 
     /**
+     * 容器回调
+     * @var array
+     */
+    protected $invokeCallback = [];
+
+    /**
      * 获取当前容器的实例（单例）
      * @access public
      * @return static
@@ -74,6 +82,27 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     public static function setInstance($instance): void
     {
         static::$instance = $instance;
+    }
+
+    /**
+     * 注册一个容器对象回调
+     *
+     * @param  string|Closure $abstract
+     * @param  Closure|null   $callback
+     * @return void
+     */
+    public function resolving($abstract, Closure $callback = null): void
+    {
+        if ($abstract instanceof Closure) {
+            $this->invokeCallback['*'][] = $abstract;
+            return;
+        }
+
+        if (isset($this->bind[$abstract])) {
+            $abstract = $this->bind[$abstract];
+        }
+
+        $this->invokeCallback[$abstract][] = $callback;
     }
 
     /**
@@ -352,9 +381,35 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
 
             $args = $constructor ? $this->bindParams($constructor, $vars) : [];
 
-            return $reflect->newInstanceArgs($args);
+            $object = $reflect->newInstanceArgs($args);
+
+            $this->invokeAfter($class, $object);
+
+            return $object;
         } catch (ReflectionException $e) {
             throw new ClassNotFoundException('class not exists: ' . $class, $class);
+        }
+    }
+
+    /**
+     * 执行invokeClass回调
+     * @access protected
+     * @param string $class  对象类名
+     * @param object $object 容器对象实例
+     * @return void
+     */
+    protected function invokeAfter(string $class, $object): void
+    {
+        if (isset($this->invokeCallback['*'])) {
+            foreach ($this->invokeCallback['*'] as $callback) {
+                $callback($object, $this);
+            }
+        }
+
+        if (isset($this->invokeCallback[$class])) {
+            foreach ($this->invokeCallback[$class] as $callback) {
+                $callback($object, $this);
+            }
         }
     }
 
@@ -379,7 +434,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
 
         foreach ($params as $param) {
             $name      = $param->getName();
-            $lowerName = $this->parseName($name);
+            $lowerName = self::parseName($name);
             $class     = $param->getClass();
 
             if ($class) {
@@ -409,7 +464,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @param bool    $ucfirst 首字母是否大写（驼峰规则）
      * @return string
      */
-    public function parseName(string $name = null, int $type = 0, bool $ucfirst = true): string
+    public static function parseName(string $name = null, int $type = 0, bool $ucfirst = true): string
     {
         if ($type) {
             $name = preg_replace_callback('/_([a-zA-Z])/', function ($match) {
@@ -419,6 +474,37 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
         }
 
         return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
+    }
+
+    /**
+     * 获取类名(不包含命名空间)
+     * @access public
+     * @param string|object $class
+     * @return string
+     */
+    public static function classBaseName($class): string
+    {
+        $class = is_object($class) ? get_class($class) : $class;
+        return basename(str_replace('\\', '/', $class));
+    }
+
+    /**
+     * 创建工厂对象实例
+     * @access public
+     * @param string $name      工厂类名
+     * @param string $namespace 默认命名空间
+     * @param array  $args
+     * @return mixed
+     */
+    public static function factory(string $name, string $namespace = '', ...$args)
+    {
+        $class = false !== strpos($name, '\\') ? $name : $namespace . ucwords($name);
+
+        if (class_exists($class)) {
+            return Container::getInstance()->invokeClass($class, $args);
+        }
+
+        throw new ClassNotFoundException('class not exists:' . $class, $class);
     }
 
     /**
