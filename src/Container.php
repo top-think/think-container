@@ -14,6 +14,7 @@ use ArrayAccess;
 use ArrayIterator;
 use Closure;
 use Countable;
+use Exception;
 use InvalidArgumentException;
 use IteratorAggregate;
 use Psr\Container\ContainerInterface;

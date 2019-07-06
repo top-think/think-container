@@ -1,7 +1,14 @@
 PHP Container & Facade Manager( Support PSR-11)
 ===============
 
+[![Build Status](https://travis-ci.org/top-think/think-container.svg?branch=2.0)](https://travis-ci.org/top-think/think-container)
+[![PHP Version](https://img.shields.io/badge/php-%3E%3D7.1-8892BF.svg)](http://www.php.net/)
+[![License](https://poser.pugx.org/topthink/think-container/license)](https://packagist.org/packages/topthink/think-container)
+
+## 安装
+~~~
 composer require topthink/think-container
+~~~
 
 ## 特性
 
