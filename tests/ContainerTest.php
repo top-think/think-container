@@ -23,7 +23,8 @@ class Taylor
 
     }
 
-    function static(Container $container) {
+    public static function test(Container $container)
+    {
         return $container;
     }
 
@@ -220,7 +221,7 @@ class ContainerTest extends TestCase
 
         $container->invokeMethod([$stub, 'some']);
 
-        $this->assertSame($container, $container->invokeMethod(Taylor::class . '::static'));
+        $this->assertSame($container, $container->invokeMethod(Taylor::class . '::test'));
 
         $reflect = new ReflectionMethod($container, 'exists');
 
@@ -230,7 +231,7 @@ class ContainerTest extends TestCase
             return $container;
         }));
 
-        $this->assertSame($container, $container->invoke(Taylor::class . '::static'));
+        $this->assertSame($container, $container->invoke(Taylor::class . '::test'));
 
         $object = $container->invokeClass(SomeClass::class);
         $this->assertInstanceOf(SomeClass::class, $object);
