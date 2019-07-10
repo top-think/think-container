@@ -470,6 +470,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     /**
      * 字符串命名风格转换
      * type 0 将Java风格转换为C的风格 1 将C风格转换为Java的风格
+     * @deprecated
      * @access public
      * @param string  $name    字符串
      * @param integer $type    转换类型
@@ -490,6 +491,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
 
     /**
      * 获取类名(不包含命名空间)
+     * @deprecated
      * @access public
      * @param string|object $class
      * @return string
@@ -502,6 +504,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
 
     /**
      * 创建工厂对象实例
+     * @deprecated
      * @access public
      * @param string $name      工厂类名
      * @param string $namespace 默认命名空间
