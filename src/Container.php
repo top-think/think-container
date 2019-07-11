@@ -103,6 +103,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
             $this->invokeCallback['*'][] = $abstract;
             return;
         }
+
         if (isset($this->bind[$abstract])) {
             $abstract = $this->bind[$abstract];
         }
@@ -245,7 +246,6 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @param string $abstract 类名或者标识
      * @param array $vars 变量
      * @param bool $newInstance 是否每次创建新的实例
-     * @throws 
      * @return mixed
      */
     public function make(string $abstract, array $vars = [], bool $newInstance = false)
@@ -302,7 +302,6 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @access public
      * @param string|array|Closure $function 函数或者闭包
      * @param array $vars 参数
-     * @throws Exception
      * @return mixed
      */
     public function invokeFunction($function, array $vars = [])
@@ -334,7 +333,6 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @access public
      * @param mixed $method 方法
      * @param array $vars 参数
-     * @throws Exception
      * @return mixed
      */
     public function invokeMethod($method, array $vars = [])
@@ -369,7 +367,6 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @param object $instance 对象实例
      * @param mixed $reflect 反射类
      * @param array $vars 参数
-     * @throws \ReflectionException
      * @return mixed
      */
     public function invokeReflectMethod($instance, $reflect, array $vars = [])
@@ -384,7 +381,6 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * @access public
      * @param mixed $callable
      * @param array $vars 参数
-     * @throws Exception
      * @return mixed
      */
     public function invoke($callable, array $vars = [])
@@ -457,8 +453,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 绑定参数
      * @access protected
      * @param \ReflectionMethod|\ReflectionFunction $reflect 反射类
-     * @param array $vars
-     * @throws \ReflectionException
+     * @param array $vars 参数
      * @return array
      */
     protected function bindParams($reflect, array $vars = []): array
