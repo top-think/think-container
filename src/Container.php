@@ -25,6 +25,7 @@ use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 use think\exception\ClassNotFoundException;
+use Traversable;
 
 /**
  * 容器管理类 支持PSR-11
@@ -564,21 +565,25 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
         $this->delete($name);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetExists($key)
     {
         return $this->exists($key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->make($key);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         $this->bind($key, $value);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetUnset($key)
     {
         $this->delete($key);
@@ -591,7 +596,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     }
 
     //IteratorAggregate
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->instances);
     }
