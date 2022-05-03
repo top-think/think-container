@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: liu21st <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-declare (strict_types = 1);
+declare (strict_types=1);
 
 namespace think;
 
@@ -25,6 +25,7 @@ use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 use think\exception\ClassNotFoundException;
+use think\helper\Str;
 use Traversable;
 
 /**
@@ -88,8 +89,8 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     /**
      * 注册一个容器对象回调
      *
-     * @param  string|Closure $abstract
-     * @param  Closure|null   $callback
+     * @param string|Closure $abstract
+     * @param Closure|null $callback
      * @return void
      */
     public function resolving($abstract, Closure $callback = null): void
@@ -109,9 +110,9 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     /**
      * 获取容器中的对象实例 不存在则创建
      * @access public
-     * @param string     $abstract    类名或者标识
-     * @param array|true $vars        变量
-     * @param bool       $newInstance 是否每次创建新的实例
+     * @param string $abstract 类名或者标识
+     * @param array|true $vars 变量
+     * @param bool $newInstance 是否每次创建新的实例
      * @return object
      */
     public static function pull(string $abstract, array $vars = [], bool $newInstance = false)
@@ -138,7 +139,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 绑定一个类、闭包、实例、接口实现到容器
      * @access public
      * @param string|array $abstract 类标识、接口
-     * @param mixed        $concrete 要绑定的类、闭包或者实例
+     * @param mixed $concrete 要绑定的类、闭包或者实例
      * @return $this
      */
     public function bind($abstract, $concrete = null)
@@ -222,9 +223,9 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     /**
      * 创建类的实例 已经存在则直接获取
      * @access public
-     * @param string $abstract    类名或者标识
-     * @param array  $vars        变量
-     * @param bool   $newInstance 是否每次创建新的实例
+     * @param string $abstract 类名或者标识
+     * @param array $vars 变量
+     * @param bool $newInstance 是否每次创建新的实例
      * @return mixed
      */
     public function make(string $abstract, array $vars = [], bool $newInstance = false)
@@ -278,7 +279,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 执行函数或者闭包方法 支持参数调用
      * @access public
      * @param string|array|Closure $function 函数或者闭包
-     * @param array $vars     参数
+     * @param array $vars 参数
      * @return mixed
      */
     public function invokeFunction($function, array $vars = [])
@@ -309,7 +310,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 调用反射执行类的方法 支持参数绑定
      * @access public
      * @param mixed $method 方法
-     * @param array $vars   参数
+     * @param array $vars 参数
      * @return mixed
      */
     public function invokeMethod($method, array $vars = [])
@@ -342,8 +343,8 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 调用反射执行类的方法 支持参数绑定
      * @access public
      * @param object $instance 对象实例
-     * @param mixed  $reflect  反射类
-     * @param array  $vars     参数
+     * @param mixed $reflect 反射类
+     * @param array $vars 参数
      * @return mixed
      */
     public function invokeReflectMethod($instance, $reflect, array $vars = [])
@@ -373,7 +374,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 调用反射执行类的实例化 支持依赖注入
      * @access public
      * @param string $class 类名
-     * @param array  $vars  参数
+     * @param array $vars 参数
      * @return mixed
      */
     public function invokeClass(string $class, array $vars = [])
@@ -407,7 +408,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     /**
      * 执行invokeClass回调
      * @access protected
-     * @param string $class  对象类名
+     * @param string $class 对象类名
      * @param object $object 容器对象实例
      * @return void
      */
@@ -430,7 +431,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 绑定参数
      * @access protected
      * @param \ReflectionMethod|\ReflectionFunction $reflect 反射类
-     * @param array                                 $vars    参数
+     * @param array $vars 参数
      * @return array
      */
     protected function bindParams($reflect, array $vars = []): array
@@ -446,8 +447,8 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
         $args   = [];
 
         foreach ($params as $param) {
-            $name      = $param->getName();
-            $lowerName = self::parseName($name);
+            $name           = $param->getName();
+            $lowerName      = Str::snake($name);
             $reflectionType = $param->getType();
 
             if ($reflectionType && $reflectionType->isBuiltin() === false) {
@@ -471,12 +472,12 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
     /**
      * 字符串命名风格转换
      * type 0 将Java风格转换为C的风格 1 将C风格转换为Java的风格
+     * @param string $name 字符串
+     * @param integer $type 转换类型
+     * @param bool $ucfirst 首字母是否大写（驼峰规则）
+     * @return string
      * @deprecated
      * @access public
-     * @param string  $name    字符串
-     * @param integer $type    转换类型
-     * @param bool    $ucfirst 首字母是否大写（驼峰规则）
-     * @return string
      */
     public static function parseName(string $name = null, int $type = 0, bool $ucfirst = true): string
     {
@@ -492,10 +493,10 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
 
     /**
      * 获取类名(不包含命名空间)
-     * @deprecated
-     * @access public
      * @param string|object $class
      * @return string
+     * @deprecated
+     * @access public
      */
     public static function classBaseName($class): string
     {
@@ -505,12 +506,12 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
 
     /**
      * 创建工厂对象实例
+     * @param string $name 工厂类名
+     * @param string $namespace 默认命名空间
+     * @param array $args
+     * @return mixed
      * @deprecated
      * @access public
-     * @param string $name      工厂类名
-     * @param string $namespace 默认命名空间
-     * @param array  $args
-     * @return mixed
      */
     public static function factory(string $name, string $namespace = '', ...$args)
     {
@@ -527,7 +528,7 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
      * 获取对象类型的参数值
      * @access protected
      * @param string $className 类名
-     * @param array  $vars      参数
+     * @param array $vars 参数
      * @return mixed
      */
     protected function getObjectParam(string $className, array &$vars)
