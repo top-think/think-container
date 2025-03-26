@@ -340,10 +340,13 @@ class ContainerTest extends TestCase
     public function testInvokeWithDefaultValues()
     {
         $container = $this->resolveContainer();
-        $container->bind(Container::class, $container);
 
-        $class = $container->make(WithDefaultValues::class);
-        $this->assertSame($container, $class->container);
+        $class = $container->invokeClass(WithDefaultValues::class);
+        $this->assertSame(null, $class->container);
+
+        $container->bind(Container::class, $container);
+        $bound = $container->invokeClass(WithDefaultValues::class);
+        $this->assertSame($container, $bound->container);
 
         $this->assertSame(null, $container->invokeMethod(WithDefaultValues::class . '::classExistsButCannotBeInjected'));
     }
