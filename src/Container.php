@@ -500,13 +500,10 @@ class Container implements ContainerInterface, ArrayAccess, IteratorAggregate, C
             $result = $value;
             array_shift($vars);
         } else {
-            try {
+            if ($param->isDefaultValueAvailable()) {
+                $result = $this->bound($className) ? $this->make($className) : $param->getDefaultValue();
+            } else {
                 $result = $this->make($className);
-            } catch (Throwable $th) {
-                if (!$param->isDefaultValueAvailable()) {
-                    throw $th;
-                }
-                $result = $param->getDefaultValue();
             }
         }
 
